@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 const sign = jwt.sign;
 const hash = bcrypt.hash;
+const compare = bcrypt.compare;
 
 const UserSchema = new Schema({
     avatar: {type: String, default: ""},
@@ -20,6 +21,10 @@ UserSchema.pre("save", async function(next){
         return next()
     }
 } )
+
+UserSchema.methods.comparePassword = async function(enteredPassword){
+    return await compare(enteredPassword, this.password)
+}
 
 UserSchema.methods.generateJWT = async function(){
     return sign({id: this._id}, process.env.JWT_SECRET_KEY, {expiresIn: "30d"} )
